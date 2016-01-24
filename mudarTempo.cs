@@ -3,67 +3,98 @@ using System.Collections;
 
 /*
 Script responsável por controlar a mudança de tempo no simRio.
-Versão: 1.0.0
-    
+Versão: 2.5.0
+ 
+
+    Ao inicializar, o script procura pelos objetos com as tags "tagDoPassado" e "tagDopresente" e os organiza nos arrays
+"objetosDoPassado" e "objetosDoPresente" respectivamente. Em seguida ele passa por cada um (foreach) dos objetos em 
+"objetosDoPassado" e os coloca como inativos. É importante que todos os objetos estejam ativos ao inicializar o jogo, pois
+a função "FindGameObjectsWithTag" não funciona em objetos inativos.
+
+    Em cada frame do jogo o script vai esperar pelo input do usuário e vai agir de acordo; pressionando a tecla "e" 
+todos os objetos em "objetosDoPassado" vão ser definidos como inativos e os em "objetosDoPresente" como ativos. Ou seja
+o jogador vai para o presente. Já se a tecla "r" for pressionada o oposto acontece e o jogador vai para o passado.  
+        
 Obs importantes: 
-1ª: Todos os objetos que irão ser controlados pelo script têm que receber as devidas tags: "passado" para
-objetos do passado e "presente" para objetos do presente (outros tempos podem ser adicionados).
-2ª: Ao compilar o jogo todos os objetos que irão ser controlados pelo script devem estar marcados como ativos. 
+1ª: O game-designer tem que definir previamente o nome das tags "tagDoPassado" e tagDoPresente" e taggear os objetos de acordo com seus
+tempos.  
+2ª: Ao compilar o jogo, todos os objetos que irão ser controlados pelo script devem estar marcados como ativos. 
+
 
 */
 
 
 public class mudarTempo : MonoBehaviour {
-    public GameObject[] objetosDoPassado;
-    public GameObject[] objetosDoPresente;
+    //Variaveis globais definidas pelo game-designer;
+    public string tagDoPassado;
+    public string tagDoPresente;
 
-    /* 
-    Ao inicializar o script procura pelos objetos com as tags "passado" e "presente" e os organiza nos arrays
-    "objetosDoPassado" e "objetosDoPresente" respectivamente". Em seguida ele passa por cada um (foreach) dos objetos em 
-    "objetosDoPassado" e os coloca como inativos. É importante que todos os objetos estejam ativos ao inicializar o jogo, pois
-    a função "FindGameObjectsWithTag" não funciona em objetos inativos.
-    */
+    //Controla a condição temporal do jogo
+    bool noPassado;
+    bool noPresente;
+
+    //Arrays que irão receber os objetos taggeados 
+    GameObject[] objetosDoPassado;
+    GameObject[] objetosDoPresente;
+
+  /* Ao inicializar */
     void Start()
     {
-        objetosDoPassado = GameObject.FindGameObjectsWithTag("passado");
-        objetosDoPresente = GameObject.FindGameObjectsWithTag("presente");
+        //Preencher os arrays "objetosDoPassado" com os objetos com a "tagDoPassado".
+        objetosDoPassado = GameObject.FindGameObjectsWithTag(tagDoPassado);
 
+        //Preencher os arrays "objetosDoPresente" com os objetos com a "tagDoPresente". 
+        objetosDoPresente = GameObject.FindGameObjectsWithTag(tagDoPresente);
+
+        //Para cada objeto em objetosDoPassado.
         foreach (GameObject objeto in objetosDoPassado)
         {
+            //Definir determinado objeto como inativo. 
             objeto.active = false;
+            noPassado = false;
+            noPresente = true;
         }
     }
 
-    /*
-    Em cada frame do jogo o script vai esperar pelo input do usuário e vai agir de acordo. Pressionando a tecla "e" 
-    todos os objetos em "objetosDoPassado" vão ser postos em inatividade e os em "objetosDoPresente" em atividade. Ou seja
-    o jogador vai para o presente. Já se a tecla "r" for pressionada o oposto acontece e o jogador vai para o passado.  
-    */
+    /* Em cada frame*/
     void Update () {
-        if (Input.GetKeyDown("e"))
+
+        //Caso o usuário aperte a tecla 'e'.
+        if (Input.GetKeyDown("e") && noPassado)
         {
-            //print("quero mudar o tempo"); <--(debug)
+            //Para cada objeto em objetosDoPassado.
             foreach (GameObject objeto in objetosDoPassado)
             {
+                //Difinir determinado objeto como inativo.
                 objeto.active = false;
             }
+            //Para cada objeto em objetosDoPresente.
             foreach (GameObject objeto in objetosDoPresente)
             {
+                //Definir determinado objeto como ativo.
                 objeto.active = true;
-            }    
+            }
+            noPassado = false;
+            noPresente = true;  
         }
-        
-        if (Input.GetKeyDown("r"))
+
+        //Caso o usuário aperte a tecla 'r'.
+        if (Input.GetKeyDown("r") && noPresente)
         {
-            //print("meu passado é meu"); <--(debug)
+            //Para cada objeto em objetosDoPassado.
             foreach (GameObject objeto in objetosDoPassado)
             {
+                //Definir determinado objeto como ativo.
                 objeto.active = true;
             }
+            //Para cada objeto em objetosDoPresente.
             foreach (GameObject objeto in objetosDoPresente)
             {
+                //Definir determinado objeto como ativo.
                 objeto.active = false;
             }
+            noPassado = true;
+            noPresente = false;
         }
 	
 	}
